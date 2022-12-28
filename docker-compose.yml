@@ -14,8 +14,9 @@ services:
     image: "${POSTGIS_IMAGE:-openmaptiles/postgis}:${TOOLS_VERSION}"
     # Use "command: postgres -c jit=off" for PostgreSQL 11+ because of slow large MVT query processing
     # Use "shm_size: 512m" if you want to prevent a possible 'No space left on device' during 'make generate-tiles-pg'
+    shm_size: 32g
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - ./pgdata:/var/lib/postgresql/data
     networks:
       - postgres
     ports:
@@ -30,12 +31,14 @@ services:
 
   import-data:
     image: "openmaptiles/import-data:${TOOLS_VERSION}"
+    shm_size: 32g
     env_file: .env
     networks:
       - postgres
 
   openmaptiles-tools: &openmaptiles-tools
     image: "openmaptiles/openmaptiles-tools:${TOOLS_VERSION}"
+    shm_size: 32g
     env_file: .env
     environment:
       # Must match the version of this file (first line)
@@ -56,6 +59,7 @@ services:
       PGPASSWORD: ${PGPASSWORD:-openmaptiles}
       PGPORT: ${PGPORT:-5432}
       MBTILES_FILE: ${MBTILES_FILE}
+      TIMEOUT: 7200000
     networks:
       - postgres
     volumes:
@@ -91,6 +95,7 @@ services:
 
   generate-vectortiles:
     image: "openmaptiles/generate-vectortiles:${TOOLS_VERSION}"
+    shm_size: 32g
     volumes:
       - ./data:/export
       - ./build/openmaptiles.tm2source:/tm2source
@@ -102,6 +107,7 @@ services:
       BBOX: ${BBOX}
       MIN_ZOOM: ${MIN_ZOOM}
       MAX_ZOOM: ${MAX_ZOOM}
+      UV_THREADPOOL_SIZE: ${UV_THREADPOOL_SIZE}
       # Control tilelive-copy threads
       COPY_CONCURRENCY: ${COPY_CONCURRENCY}
       #
@@ -112,6 +118,7 @@ services:
 
   postserve:
     image: "openmaptiles/openmaptiles-tools:${TOOLS_VERSION}"
+    shm_size: 32g
     command: "postserve ${TILESET_FILE} --verbose --serve=${OMT_HOST:-http://localhost}:${PPORT:-8090}"
     env_file: .env
     environment:
