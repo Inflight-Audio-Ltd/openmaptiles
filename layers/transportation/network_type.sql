@@ -17,7 +17,9 @@ $$
                 'us-interstate', 'us-highway', 'us-state',
                 'ca-transcanada', 'ca-provincial-arterial', 'ca-provincial',
                 'gb-motorway', 'gb-trunk', 'gb-primary',
-                'ie-motorway', 'ie-national', 'ie-regional'
+                'ie-motorway', 'ie-national', 'ie-regional',
+                'e-road',
+                'a-road'
                 );
     END
 $$;
@@ -29,18 +31,27 @@ $$
         -- Canada
         'ca-transcanada', 'ca-provincial-arterial',
         -- United States
-        'us-interstate');
+        'us-interstate', 'us-highway',
+        -- UK
+        'gb-motorway', 'gb-trunk',
+        -- Ireland
+        'ie-motorway', 'ie-national',
+        -- Europe
+        'e-road',
+        -- Asia
+        'a-road'
+    );
 $$ LANGUAGE sql IMMUTABLE
                 PARALLEL SAFE;
 
-DO
-$$
-    BEGIN
-        BEGIN
-            ALTER TABLE osm_route_member
-                ADD COLUMN network_type route_network_type;
-        EXCEPTION
-            WHEN duplicate_column THEN RAISE NOTICE 'column network_type already exists in network_type.';
-        END;
-    END;
-$$;
+CREATE OR REPLACE FUNCTION create_route_hstore(network TEXT, ref TEXT, name TEXT, colour TEXT, ref_colour TEXT)
+RETURNS hstore AS $$
+SELECT CASE
+           WHEN network = '' THEN hstore('')
+           ELSE hstore(
+               ARRAY['network', 'ref', 'name', 'colour'],
+               ARRAY[network, NULLIF(ref, ''), NULLIF(name, ''), COALESCE(NULLIF(colour, ''), NULLIF(ref_colour, ''))]
+           )
+       END;
+$$ LANGUAGE sql IMMUTABLE
+    PARALLEL SAFE;
