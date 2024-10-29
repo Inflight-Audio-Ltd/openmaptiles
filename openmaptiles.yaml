@@ -13,8 +13,8 @@ tileset:
     - layers/water_name/water_name.yaml
     - layers/transportation_name/transportation_name.yaml
     - layers/place/place.yaml
-    - layers/housenumber/housenumber.yaml
-    - layers/poi/poi.yaml
+    #- layers/housenumber/housenumber.yaml
+    #- layers/poi/poi.yaml
     - layers/aerodrome_label/aerodrome_label.yaml
   name: OpenMapTiles
   version: 3.15.0
@@ -24,7 +24,7 @@ tileset:
   center: [0, 0, 1]
   bounds: [-180.0,-85.0511,180.0,85.0511]
   maxzoom: 12
-  minzoom: 1
+  minzoom: 0
   pixel_scale: 256
   languages:
     - am # Amharic
