@@ -7,6 +7,8 @@ run() { log $@; $@; }
 
 STAGE=STAGE-3
 
+rm -f ./pgdata/.empty
+
 log "---------------------------------"
 log "START"
 run make generate-tiles-pg

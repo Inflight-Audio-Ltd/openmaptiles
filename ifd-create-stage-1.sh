@@ -7,6 +7,8 @@ run() { log $@; $@; }
 
 STAGE=STAGE-1
 
+rm -f ./pgdata/.empty
+
 log "---------------------------------"
 log "START"
 run make clean

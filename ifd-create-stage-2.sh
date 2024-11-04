@@ -7,6 +7,8 @@ run() { log $@; $@; }
 
 STAGE=STAGE-2
 
+rm -f ./pgdata/.empty
+
 log "---------------------------------"
 log "START (manual step)"
 run make psql
